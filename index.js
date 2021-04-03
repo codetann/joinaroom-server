@@ -5,14 +5,11 @@ const io = require("socket.io")(http);
 const { rooms, addToRoom } = require("./rooms");
 const PORT = process.env.PORT || 5000;
 
-const clients = [];
-
 // - Socket.io - //
 io.sockets.on("connection", (socket) => {
   /* joins the user to a specific room */
   socket.on("sign-in", (room) => {
     addToRoom(room.room);
-    clients.push(socket);
     socket.join(room.room);
     io.sockets.in(room.room).emit("message", {
       id: "admin",
@@ -25,9 +22,14 @@ io.sockets.on("connection", (socket) => {
     io.sockets.in(room).emit("message", { id, message, username });
   });
 
+  /* test socket for disconnecting */
+  socket.on("test", (room) => {
+    console.log("[test] - user disconnected");
+  });
+
   /* socket disconnect */
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    // console.log("user disconnected");
   });
 });
 
